@@ -4,14 +4,20 @@ from PIL import Image
 import imagehash
 import matplotlib.pyplot as plt
 from collections import defaultdict
+from multiprocessing import Pool, cpu_count
 from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import GlobalAveragePooling2D
+import tensorflow as tf
 
-# подрубаем предобученную модель VGG16
-base_model = VGG16(weights='imagenet', include_top=False)
-model = Model(inputs=base_model.input, outputs=GlobalAveragePooling2D()(base_model.output))
+# инициализируем модель как глобальную переменную
+model = None
+
+def initialize_model():
+    global model
+    base_model = VGG16(weights='imagenet', include_top=False)
+    model = Model(inputs=base_model.input, outputs=GlobalAveragePooling2D()(base_model.output))
 
 def load_images_from_folder(folder):
     """загружаем картинки из указанной папки"""
@@ -26,7 +32,7 @@ def load_images_from_folder(folder):
                 print(f"Could not open image {img_path}: {e}")
     return images
 
-def image_to_feature_vector(img, model):
+def image_to_feature_vector(img):
     """делаем из картинки вектор признаков с помощью модели"""
     img = img.resize((224, 224))
     img_array = image.img_to_array(img)
@@ -35,22 +41,30 @@ def image_to_feature_vector(img, model):
     features = model.predict(img_array)
     return features.flatten()
 
+def process_image(img_path):
+    """обрабатываем одну картинку - извлекаем хэш и признаки"""
+    try:
+        img = Image.open(img_path)
+        img_hash = imagehash.average_hash(img)
+        features = image_to_feature_vector(img)
+        return img_path, img_hash, features
+    except Exception as e:
+        print(f"Error processing image {img_path}: {e}")
+        return img_path, None, None
+
 def find_duplicates(images):
     """ищем дубликаты картинок по хэшам и признакам"""
     hash_dict = defaultdict(list)
     feature_dict = defaultdict(list)
 
-    for img, path in images:
-        # считаем хэш картинки
-        img_hash = imagehash.average_hash(img)
-        hash_dict[img_hash].append(path)
+    with Pool(cpu_count(), initializer=initialize_model) as pool:
+        results = pool.map(process_image, [img[1] for img in images])
 
-        # извлекаем признаки картинки
-        try:
-            features = image_to_feature_vector(img, model)
+    for path, img_hash, features in results:
+        if img_hash is not None:
+            hash_dict[img_hash].append(path)
+        if features is not None:
             feature_dict[tuple(features)].append(path)
-        except Exception as e:
-            print(f"Error processing image {path}: {e}")
 
     # дубликаты по хэшам
     hash_duplicates = [paths for paths in hash_dict.values() if len(paths) > 1]
