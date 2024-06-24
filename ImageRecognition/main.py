@@ -9,7 +9,6 @@ from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import GlobalAveragePooling2D
-import tensorflow as tf
 
 # инициализируем модель как глобальную переменную
 model = None
