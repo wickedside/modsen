@@ -9,6 +9,7 @@ from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import GlobalAveragePooling2D
+from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 # initialize the model as a global variable
 model = None
@@ -99,23 +100,28 @@ def display_duplicates(duplicates):
     def update_display():
         for ax in axes:
             ax.clear()
-        for ax, img_path in zip(axes, duplicates[index]):
-            img = Image.open(img_path)
-            ax.imshow(img)
-            ax.set_title(os.path.basename(img_path))
-            ax.axis('off')
-        fig.canvas.draw()
+        if duplicates:
+            for ax, img_path in zip(axes, duplicates[index]):
+                img = Image.open(img_path)
+                ax.imshow(img)
+                ax.set_title(os.path.basename(img_path))
+                ax.axis('off')
+        fig.canvas.draw_idle()
 
-    def on_press(event):
+    def custom_forward(*args):
         nonlocal index
-        if event.key == 'right':
-            index = (index + 1) % len(duplicates)
-            update_display()
-        elif event.key == 'left':
-            index = (index - 1) % len(duplicates)
-            update_display()
+        index = (index + 1) % len(duplicates)
+        update_display()
 
-    fig.canvas.mpl_connect('key_press_event', on_press)
+    def custom_back(*args):
+        nonlocal index
+        index = (index - 1) % len(duplicates)
+        update_display()
+
+    # monkey patch the forward and back buttons
+    NavigationToolbar2Tk.forward = custom_forward
+    NavigationToolbar2Tk.back = custom_back
+
     update_display()
     plt.show()
 
