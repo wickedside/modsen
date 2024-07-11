@@ -1,1 +1,1 @@
-from .find_duplicates import find_duplicates
+from ImageRecognition.utils.find_duplicates import find_duplicates

@@ -1,6 +1,6 @@
 from PIL import Image
 import imagehash
-from features import image_to_feature_vector
+from ImageRecognition.image_processing.features import image_to_feature_vector
 
 def process_image(img_path):
     """process a single image - extract hash and features"""

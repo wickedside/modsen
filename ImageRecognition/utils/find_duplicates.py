@@ -1,7 +1,7 @@
 from collections import defaultdict
 from multiprocessing import Pool, cpu_count
-from ..image_processing.hash_images import process_image
-from ..model import initialize_model
+from ImageRecognition.image_processing.hash_images import process_image
+from ImageRecognition.model.model import initialize_model
 
 
 def find_duplicates(images):
