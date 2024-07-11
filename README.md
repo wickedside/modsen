@@ -5,6 +5,8 @@
 Этот репозиторий содержит проекты, выполненные в качестве практики. Ниже приведены краткие описания каждого проекта.
 
 ### 1. Image Recognition
+![img of gui main window](https://img001.prntscr.com/file/img001/VHqh3dxtQ2Wq3ktWfxQXyQ.png)
+![img of gui duplicate viewer window](https://img001.prntscr.com/file/img001/4PicvzZyT06L1eIFBR660g.png)
 
 Этот проект включает скрипт для поиска дубликатов изображений в указанных папках. Он использует модель VGG16 для извлечения признаков изображений и сравнения их по хэшам и признакам.
 
@@ -17,6 +19,10 @@
 #### Запуск:
 ```bash
 python main.py <путь_к_папке1> [<путь_к_папке2>]
+```
+или
+```bash
+python gui.py
 ```
 
 ### 2. HTTPWeatherAPI
