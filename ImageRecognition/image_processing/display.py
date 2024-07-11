@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 def display_duplicates(duplicates):
+    """display the found duplicates"""
     fig, axes = plt.subplots(1, 2, figsize=(15, 5))
     index = 0
-
     def update_display():
         for ax in axes:
             ax.clear()
@@ -28,6 +28,7 @@ def display_duplicates(duplicates):
         index = (index - 1) % len(duplicates)
         update_display()
 
+    # monkey patch the forward and back buttons
     NavigationToolbar2Tk.forward = custom_forward
     NavigationToolbar2Tk.back = custom_back
 
