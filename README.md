@@ -24,6 +24,10 @@ python main.py <путь_к_папке1> [<путь_к_папке2>]
 ```bash
 python gui.py
 ```
+#### Запуск всех тестов:
+```bash
+python -m unittest discover -s tests
+```
 
 ### 2. HTTPWeatherAPI
 
